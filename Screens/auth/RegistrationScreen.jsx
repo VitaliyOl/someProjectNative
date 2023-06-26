@@ -1,15 +1,11 @@
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import { useNavigation } from '@react-navigation/native';
-
-import React, { useRef, useState } from 'react';
-import { View, TextInput, Button, StyleSheet , Text, ImageBackground, Dimensions, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, TouchableOpacity, Image, useWindowDimensions, Alert} from 'react-native';
+import React, { useState } from 'react';
+import { View, TextInput, StyleSheet , Text, ImageBackground, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, TouchableOpacity, useWindowDimensions} from 'react-native';
 import AddUserImage from '../../Components/AddUserImage';
 import { registerDB } from '../../redux/auth/AuthOperation';
 import { useDispatch } from 'react-redux';
-
-
-
 
 
 const registrationState = {
@@ -23,6 +19,7 @@ const RegistrationScreen = () => {
   const [state, setState] = useState(registrationState)
   const [secureTextEntry, setSecureTextEntry] = useState(true);
   const [isFocused, setIsFocused] = useState(false);  
+  const [emailError, setEmailError] = useState('');
   
   const {height, width} = useWindowDimensions(); 
 
@@ -65,15 +62,22 @@ const RegistrationScreen = () => {
   const handleFocus = (input) => setIsFocused(input);
   const handleBlur = () => setIsFocused(false);
 
-  
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
   
 
   const handleSubmit = () => {
-setState(registrationState)
-// setIsAuth(true)
-dispatch(registerDB(state))
+    if (!validateEmail(state.email)) {
+      setEmailError('Невірний формат електронної пошти');
+      return;
+    }
 
-console.log(state);
+    setEmailError('');
+    setState(registrationState);
+    dispatch(registerDB({ ...state, avatar: image }));
+
   }
 
 
@@ -117,6 +121,7 @@ placeholder="Логін" value={state.login}
           setState(prev => ({
               ...prev, email : value
           }))
+          setEmailError('');
         }} 
         onFocus={()=>{handleFocus('email')}}
         onBlur={handleBlur}

@@ -6,38 +6,32 @@ import {
     signOut
 } from 'firebase/auth';
 import { auth } from '../../firebase/config';
-import {updateUserProfile, authStateChange} from '../auth/AuthReducer'
+import {updateUserProfile, authStateChange, setAvatar} from '../auth/AuthReducer'
 
 
 
-export const registerDB = ({email, password, login}) => async (dispatch, getState) => {
+export const registerDB = ({email, password, login, avatar}) => async (dispatch, getState) => {
   try {
     await createUserWithEmailAndPassword(auth, email, password);
-    const user  = await auth.currentUser
+    const user  = await auth.currentUser    
     
     await updateProfile(user, {
         displayName: login,
-      });
+        photoURL: avatar,           
+      });     
 
-      const {displayName, uid } = auth.currentUser;    
+      const {displayName, uid, photoURL } = auth.currentUser;    
    
     dispatch(updateUserProfile({
       userId: uid,
       login: displayName,
+      email: email,
+      avatar: photoURL,          
     }));
   } catch (error) {
     throw error;
   }
 };
-
-
-// export const authStateChanged = async (onChange = () => {}) => {
-//   onAuthStateChanged((user) => {           
-//           onChange(user);
-//   });
-// };
-
-
 
 export const authStateChangeUser = () => async (dispatch, getState) => {
       await onAuthStateChanged(auth, (user) => {
@@ -45,6 +39,8 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
             const userUpdate = {
               userId: user.uid,
               login: user.displayName,
+              email: user.email,
+              avatar: user.photoURL,             
             }
             dispatch(updateUserProfile(userUpdate));
             dispatch(authStateChange({stateChange: true}));
@@ -57,12 +53,16 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
 
 export const loginDB = ({email,password}) => async (dispatch, getState) => {
   try {
-    const credentials = await signInWithEmailAndPassword(auth, email, password); 
+    const credentials = await signInWithEmailAndPassword(auth, email, password);  
     
-    const {displayName, uid} = credentials.user;
+    
+    const {displayName, uid, photoURL} = credentials.user;
+   
     dispatch(updateUserProfile({
       userId: uid,
       login: displayName,
+      email: email,
+      avatar: photoURL,         
     }));
     
         return credentials.user;
@@ -82,6 +82,8 @@ export const signOutDB = () => async (dispatch, getState) => {
     dispatch(updateUserProfile({
       userId: null,
       login: null,
+      email: null,
+      avatar: null,
     }));
     
     dispatch(authStateChange({stateChange: false}));
@@ -91,27 +93,3 @@ export const signOutDB = () => async (dispatch, getState) => {
      throw error;
   }
 };
-
-
-const updateUser = async (dispatch, update) => {
-  
-  const user = auth.currentUser;
-
-  // якщо такий користувач знайдений
-  if (user) {
-
-  // оновлюємо його профайл
-        try {
-           await updateProfile(user, update);  
-           console.log(user);          
-          dispatch(updateUserProfile({
-            userId: user.uid,
-            login: user.displayName,
-          }))   
-                
-        } catch(error) {
-            throw error
-        }
-  }
-};
-

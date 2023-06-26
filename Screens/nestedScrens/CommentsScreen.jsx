@@ -1,22 +1,25 @@
-import React, { useState, useContext, useEffect } from 'react';
-import {Text, TextInput, View, StyleSheet, FlatList, Image, TouchableOpacity, SafeAreaView } from 'react-native'
+import React, { useState, useEffect } from 'react';
+import {KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Text, TextInput, View, StyleSheet, FlatList, Image, TouchableOpacity, SafeAreaView } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
-import { CountContext } from '../../Components/CountContext';
 import DateComponent from '../../Components/DateComponent';
 import {  getDocs,updateDoc, doc, collection, addDoc, onSnapshot} from "firebase/firestore";
 import { db } from '../../firebase/config';
 import { useSelector } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
 
 
 
-function CommentsScreen({route}) {  
+
+function CommentsScreen({navigation, route}) {  
   const {uri}  = route?.params ?? {};
   const {postId} = route.params;
   const [photos, setPhotos] = useState([uri]);
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
   const [user, setUser] = useState('') 
-  const [isFocused, setIsFocused] = useState(false);   
+  const [isFocused, setIsFocused] = useState(false); 
+  const isFocuseded = useIsFocused();  
+
 
   const {login} = useSelector((state)=>state.auth) 
 
@@ -32,6 +35,17 @@ function CommentsScreen({route}) {
       
     getPosts()
   },[])
+
+  useEffect(() => {
+    if (isFocuseded) {
+      navigation?.getParent('home')?.setOptions({
+        tabBarStyle: { display: 'none' },
+        headerShown: false,       
+      });
+    }
+  }, []);
+
+
 
 
   const getPosts = async () => {
@@ -107,6 +121,9 @@ const createComment =async () => {
   
 
   return (
+    <TouchableWithoutFeedback onPress={()=>Keyboard.dismiss}>
+
+
     <View style={styles.container}>
    <View>
    <FlatList 
@@ -121,8 +138,10 @@ const createComment =async () => {
       }}  
     />
    </View>  
+ 
 
 <FlatList data={comments} keyExtractor={(item, indx) => indx.toString()} renderItem={renderComment} />
+
 
 <View>
 <TextInput  style={[styles.input, isFocused === 'comment' && styles.inputFocus]}
@@ -137,10 +156,13 @@ onBlur={handleBlur}
 <TouchableOpacity style={styles.iconInput} onPress={handleCommentSubmit}>   
    <Ionicons name="arrow-up-circle-sharp" size={34} color="#FF6C00" />
 </TouchableOpacity>
-</View>
-  
+</View>  
     
   </View>
+ 
+
+  
+  </TouchableWithoutFeedback>
 
   );
 }
@@ -166,7 +188,8 @@ const styles = StyleSheet.create({
     borderColor: 'black',
   },
   thumbComment: {
-
+    flex:1,
+    justifyContent: 'flex-end',
   },
   input: {
     padding: 16,

@@ -5,12 +5,13 @@ import { collection, addDoc } from "firebase/firestore";
 import { db } from '../firebase/config';
 
 import * as Location from "expo-location";
-import React, { useState, useEffect, useRef } from "react";
-import { Image ,Text, View, TouchableOpacity, StyleSheet, Platform, TextInput, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Image ,Text, View, TouchableOpacity, StyleSheet, TextInput, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from "react-native";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import * as ImagePicker from 'expo-image-picker';
 import { useSelector } from 'react-redux';
+
 
 
 function CreatePostsScreen({navigation}) {
@@ -21,7 +22,9 @@ function CreatePostsScreen({navigation}) {
   const [photo, setPhoto] = useState(null)
   const [hasPermission, setHasPermission] = useState(null);
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);  
+  const [isFocused, setIsFocused] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false); 
+
 
   const {userId, login} = useSelector((state)=>state.auth)
 
@@ -44,6 +47,7 @@ useEffect(() => {
     }    
   })();
 }, []);
+
 
   if (hasPermission === null) {
     return <View />;
@@ -110,7 +114,7 @@ useEffect(() => {
 
   const sendPhoto = () => {
     writeDataToFirestore()
-    navigation.navigate('DefaultScreen')
+    navigation.navigate('DefaultScreen', {isDataLoaded})
     setComment('')
     setTextLocation('')
   }
@@ -128,6 +132,7 @@ useEffect(() => {
         userId: userId,
       });
       console.log('Document written with ID: ', docRef.id);
+      setIsDataLoaded(true);
     } catch (e) {
       console.error('Error adding document: ', e);
       throw e;
@@ -275,7 +280,7 @@ gap: 16,
   },
   button: {
     paddingVertical: 16,
-      marginBottom: 40,
+     
     borderRadius: 100,
     backgroundColor: '#FF6C00',
   },
@@ -294,7 +299,9 @@ position: 'absolute',
     paddingVertical: 16,
   },
   deleteIcon: {
- alignItems: 'center'
+ alignItems: 'center',
+ marginTop: 87,
+ 
   },
  titlePublish: {
   textAlign: 'center',

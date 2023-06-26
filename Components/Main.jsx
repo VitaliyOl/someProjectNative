@@ -9,9 +9,7 @@ import Home from "../Screens/Home";
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import {  authStateChangeUser } from '../redux/auth/AuthOperation';
-
-
-
+import ProfileScreen from '../Screens/ProfileScreen';
 
 
 
@@ -26,9 +24,7 @@ export default function Main () {
 
     useEffect(() => {
       dispatch(authStateChangeUser())      
-    }, []);
-
-   
+    }, []);   
    
     
   const isLogin = () => {
@@ -54,11 +50,13 @@ export default function Main () {
       );
     }
     return (    
-      <MainStack.Screen name="HomeScreen" options={{ headerShown: false }}>
+     <>
+       <MainStack.Screen name="HomeScreen" options={{ headerShown: false }}>
         {({ navigation }) => (
           <Home navigation={navigation} dispatch={dispatch}/>
         )}
-      </MainStack.Screen>      
+      </MainStack.Screen>       
+     </> 
     );
   };
    

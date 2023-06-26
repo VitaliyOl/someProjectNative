@@ -9,7 +9,6 @@ import {  signOutDB} from '../redux/auth/AuthOperation';
 
 
 
-
 const Tab = createBottomTabNavigator();
 
 function Home({ navigation, dispatch}) {
@@ -17,9 +16,12 @@ function Home({ navigation, dispatch}) {
   const handleSignOut = () => {   
     signOutDB()(dispatch);
  };
+
  
   return (
-    <Tab.Navigator screenOptions={{
+    <Tab.Navigator 
+     id="home"
+    screenOptions={{
  headerTitleAlign: 'center',
 
 headerStyle: {
@@ -85,7 +87,8 @@ tabBarItemStyle: {
         name='CreatePostsScreen'
         component={CreatePostsScreen}
         options={{
-           
+          tabBarStyle: { display: 'none' },
+          headerShown: true,               
            headerTitle: () => (
            <Text
              style={{
@@ -111,13 +114,13 @@ tabBarItemStyle: {
 
          tabBarIcon: ({ color }) => (
            <Feather name="plus" size={24} color={color} />
-         ),
+         ),        
        }}
     />
     <Tab.Screen
         name='ProfileScreen'
         component={ProfileScreen}
-        options={{
+        options={{                
             headerShown: false,
             tabBarIcon: ({ color }) => (
             <Feather name="user" size={24} color={color} />

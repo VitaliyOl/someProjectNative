@@ -3,10 +3,16 @@ import { Text, View, FlatList, Image, StyleSheet, TouchableOpacity } from 'react
 import { Feather } from '@expo/vector-icons';
 import { collection, getDocs } from 'firebase/firestore'; 
 import { db } from '../../firebase/config';
+import { useSelector } from 'react-redux';
 
 
-function DefaultScreenPosts({navigation}) {
+function DefaultScreenPosts({navigation, route}) {
   const [posts, setPosts] = useState([]) 
+
+  const {email, login, avatar, userId} = useSelector((state)=>state.auth)
+
+ 
+ 
 
   const getDataFromFirestore = async () => {
     try {
@@ -26,8 +32,12 @@ function DefaultScreenPosts({navigation}) {
   };
 
   useEffect(()=>{
-    getDataFromFirestore()      
-  }, []) 
+    if(route.params || db || userId) {
+      getDataFromFirestore()   
+    }
+      
+  }, [db, route.params, userId]) 
+  
 
  const sendMap = (location) => {
   navigation.navigate('Map', {location})  
@@ -55,15 +65,27 @@ function DefaultScreenPosts({navigation}) {
   </View>
 )
   
-  return (
+  return (   
+
+   
     <View style={styles.container}>
+    <View style={styles.fotoContainer }>
+    <Image style={styles.userFoto} source={avatar !== null ? {uri: avatar} : null } />
+    <View style={styles.textContainer}>
+      <Text style={styles.textLogin}>{login}</Text>
+      <Text style={styles.textEmail}>{email}</Text>
+    </View> 
+    </View>
     
-     <FlatList data={posts} 
+    <View style={{flex: 1}}>
+    <FlatList data={posts} 
      keyExtractor={(item, indx)=>indx.toString()}
      renderItem={renderPostItem}    
      />
-    
+    </View>    
     </View>
+    
+    
   )
 }
 
@@ -71,10 +93,42 @@ export default DefaultScreenPosts
 
 
 const styles = StyleSheet.create({
+  thumb: {
+    paddingTop: 32,
+    paddingHorizontal: 16,
+  },
 container: {
   flex: 1,
   paddingTop: 32,
   paddingHorizontal: 16, 
+},
+fotoContainer: {
+  flex: 0.13,
+  flexDirection: 'row', 
+  marginBottom: 32,  
+},
+userFoto: {
+  width: 60,
+  height: 60,
+  borderRadius: 16,
+  backgroundColor: '#f6f6f6',
+  marginRight: 8,
+ 
+},
+textContainer: {
+  justifyContent: 'center',  
+},
+textEmail: { 
+  fontSize: 11,
+  lineHeight: 13,
+  fontFamily: 'Roboto-Medium',
+  color: '#212121CC'
+},
+textLogin: { 
+  fontSize: 13,
+    lineHeight: 16,
+    fontFamily: 'Roboto-Regular',
+    color: '#212121',
 },
 imageThumb: { 
   marginBottom: 32,

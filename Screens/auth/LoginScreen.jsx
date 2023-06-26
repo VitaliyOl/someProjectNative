@@ -15,6 +15,7 @@ const LoginScreen = () => {
   const [state, setState] = useState(userState)
   const [secureTextEntry, setSecureTextEntry] = useState(true);  
   const {height, width} = useWindowDimensions();
+  const [emailError, setEmailError] = useState('');
 
   const dispatch = useDispatch()
 
@@ -35,17 +36,21 @@ const LoginScreen = () => {
    
   };
 
-
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
   const handleSubmit = () => {
-    setState(userState) 
-    // setIsAuth(true)      
-    dispatch(loginDB(state))
-    
-      }
-    
+    if (!validateEmail(state.email)) {
+      setEmailError('Невірний формат електронної пошти');
+      return;
+    }
 
-      
+    setEmailError('');
+    setState(userState);
+    dispatch(loginDB(state));
+  };
 
   return (  
    
@@ -67,6 +72,7 @@ const LoginScreen = () => {
           setState(prev => ({
               ...prev, email : value
           }))
+          setEmailError('');
         }} 
         onFocus={()=>{handleFocus('email')}}
         onBlur={handleBlur}

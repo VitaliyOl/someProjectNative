@@ -2,23 +2,63 @@ import { createStackNavigator } from "@react-navigation/stack"
 import DefaultScreenPosts from "./nestedScrens/DefaultScreenPosts"
 import MapScreen from "./nestedScrens/MapScreen"
 import CommentsScreen from './nestedScrens/CommentsScreen'
-import { CountProvider } from "../Components/CountContext"
-// import { CountContext } from "../Components/CountContext"
-
+import { Feather } from '@expo/vector-icons';
+import { Text } from "react-native";
 
 
 const NestedScreen = createStackNavigator()
 
 
-function PostsScreen() {
+function PostsScreen({navigation}) {
   return (
-    <CountProvider>
-        <NestedScreen.Navigator> 
-      <NestedScreen.Screen name='DefaultScreen' component={DefaultScreenPosts} options={{ tabBarLabel: null }}/> 
-      <NestedScreen.Screen name='Map' component={MapScreen}  options={{ headerShown: false, tabBarLabel: null }}/> 
-      <NestedScreen.Screen name='Comments' component={CommentsScreen}  options={{ headerShown: false, tabBarLabel: null }}/> 
-        </NestedScreen.Navigator> 
-        </CountProvider>
+        <NestedScreen.Navigator initialRouteName="DefaultScreen" screenOptions={{ headerShown: false }}> 
+      <NestedScreen.Screen name='DefaultScreen' component={DefaultScreenPosts} options={  navigation?.getParent('home')?.setOptions({
+        tabBarStyle:  {
+          height: 83,
+          paddingTop: 10,
+          paddingBottom: 34,
+          paddingHorizontal: 80,
+          borderTopWidth: 1,
+          borderColor: '#E5E5E5'
+        },
+        headerShown: true,
+        headerLeft: null,
+      })}/> 
+      <NestedScreen.Screen name='Comments' component={CommentsScreen} options={{
+        headerShown: true, 
+        headerTitleAlign: 'center',           
+           headerTitle: () => (
+           <Text
+             style={{
+               marginBottom: 10,
+                   fontWeight: 500,
+                   fontSize: 17,
+                   lineHeight: 22,    
+                   fontFamily: 'Roboto-Medium',
+             }}
+           >
+             Коментарі
+           </Text>
+         ),
+      }}/> 
+      <NestedScreen.Screen name='Map' component={MapScreen} options={{
+       headerShown: true, 
+        headerTitleAlign: 'center',           
+           headerTitle: () => (
+           <Text
+             style={{
+               marginBottom: 10,
+                   fontWeight: 500,
+                   fontSize: 17,
+                   lineHeight: 22,    
+                   fontFamily: 'Roboto-Medium',
+             }}
+           >
+             Карта
+           </Text>
+         ),
+      }} /> 
+        </NestedScreen.Navigator>        
 )
 }
 
